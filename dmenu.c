@@ -759,8 +759,8 @@ static void
 usage(void)
 {
 	fputs("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
-	      "             [-h height]\n"
-	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]\n", stderr);
+	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]\n"
+	      "             [-it text] [-h height]\n", stderr);
 	exit(1);
 }
 
@@ -794,6 +794,7 @@ main(int argc, char *argv[])
 {
 	XWindowAttributes wa;
 	int i, fast = 0;
+	int read_x = 1;
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
@@ -824,19 +825,30 @@ main(int argc, char *argv[])
 			lineheight = atoi(argv[++i]);
 			lineheight = MAX(lineheight,8); /* reasonable default in case of value too small/negative */
 		}
-		else if (!strcmp(argv[i], "-nb"))  /* normal background color */
+		else if (!strcmp(argv[i], "-nb")) {  /* normal background color */
 			colors[SchemeNorm][ColBg] = argv[++i];
-		else if (!strcmp(argv[i], "-nf"))  /* normal foreground color */
+			read_x = 0;
+		}
+		else if (!strcmp(argv[i], "-nf")) { /* normal foreground color */
 			colors[SchemeNorm][ColFg] = argv[++i];
-		else if (!strcmp(argv[i], "-sb"))  /* selected background color */
+			read_x = 0;
+		}
+		else if (!strcmp(argv[i], "-sb")) { /* selected background color */
 			colors[SchemeSel][ColBg] = argv[++i];
-		else if (!strcmp(argv[i], "-sf"))  /* selected foreground color */
+			read_x = 0;
+		}
+		else if (!strcmp(argv[i], "-sf")) { /* selected foreground color */
 			colors[SchemeSel][ColFg] = argv[++i];
+			read_x = 0;
+		}
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
 	    else if (!strcmp(argv[i], "-bw"))
 			border_width = atoi(argv[++i]);
-		else
+		else if (!strcmp(argv[i], "-it")) {   /* embedding window id */
+			const char * text = argv[++i];
+			insert(text, strlen(text));
+		} else
 			usage();
 
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
@@ -854,7 +866,10 @@ main(int argc, char *argv[])
 		    parentwin);
 	xinitvisual();
 	drw = drw_create(dpy, screen, root, wa.width, wa.height, visual, depth, cmap);
-	read_Xresources();
+	if(read_x == 1) {
+		read_Xresources();
+		printf("%s", "TEstinsda");
+	}
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
