@@ -868,7 +868,6 @@ main(int argc, char *argv[])
 	drw = drw_create(dpy, screen, root, wa.width, wa.height, visual, depth, cmap);
 	if(read_x == 1) {
 		read_Xresources();
-		printf("%s", "TEstinsda");
 	}
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
